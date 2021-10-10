@@ -1,0 +1,113 @@
+{
+    "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+    "data":{ "url": "./data/nobel_prize_by_winner.csv"},
+    "transform": [
+      {
+        
+          "aggregate": [
+                       {"op": "count", "as": "Total Prize"}
+    
+                      ],
+           "groupby": ["bornCountryCode","category"]
+         } 
+        
+         
+    ],
+     
+      
+      "vconcat":[    
+        
+            {   "width": 800,
+              "height": 350,
+               "layer":
+              [   
+               {  "title": "Nobel Prize Winner in World",
+                   
+                  "data": {
+                          "url": "./js/ne_110m_admin_0_countries.topojson",
+                          "format": {"type": "topojson", "feature": "ne_110m_admin_0_countries"}
+                         },
+                   "projection": {"type": "equalEarth"},
+                   
+                
+                
+                   
+                 "mark": {"type": "geoshape", "fill": "lightgray", "stroke": "white"}
+                 
+                
+                 
+               },
+             
+               { 
+                 "mark":{"type": "circle","color":"blue","tooltip": {"content": "data"}},
+           
+                 "transform": [
+              
+                  
+                                  {
+                                    "lookup": "bornCountryCode",
+                                    "from":{
+                                            "data":{"url":"./data/countries_centriod.csv" },
+                                            "key": "Short",
+                                            "fields": ["Central_lat","Central_lng"]
+                                    }
+                                   }
+                                   
+                          
+                              ],
+              
+                  "encoding": {
+                                  "latitude":{"field":"Central_lat","type": "quantitative"},
+                                 "longitude":{"field":"Central_lng","type": "quantitative"},
+                              
+                                  "size":{
+                                           "field":"Total Prize",
+                                           "type": "quantitative",
+                                           "scale": {"domain":[0,200] }
+                                         }
+             
+                              }
+                 }
+    
+             ]
+          },
+            {    "width": 800,
+              "height": 100,
+              "mark":{"type": "bar","color":"blue","tooltip": {"content": "data"}},
+         
+           "transform": [
+         
+            
+            {
+              "lookup": "bornCountryCode",
+                                    "from":{
+                                            "data":{"url":"./data/countries_centriod.csv" },
+                                            "key": "Short",
+                                            "fields": ["Country"]
+                                          }
+            }
+            
+            
+         
+          ],
+    
+            "encoding": {
+              "x":{"field":"Country","type": "nominal"},
+              "y": { "field": "Total Prize","type": "quantitative"},
+              "color":{"field":"category","type": "nominal"}
+              
+            }
+           
+            
+          }
+        ]
+      }
+            
+              
+          
+          
+      
+         
+         
+    
+      

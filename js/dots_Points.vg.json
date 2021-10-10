@@ -1,0 +1,131 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "data": {"url": "./data/nobel_final.csv"},
+  "transform": [
+     {"window": [{"op":"row_number","as": "row_number"}],"groupby": ["data"]} 
+   
+  ],
+   
+  
+
+  "vconcat": [
+    {
+      "width":110,
+      "height":350,
+      "params": [{"name": "select",  "select":{"type": "point","on":"mousedown"}},
+                  {"name": "click","select": {"type": "point", "fields": ["gender"]},
+                  "bind": "legend"}
+               ],
+
+      "transform": [
+        { "window": [{"op": "rank", "as": "id"}],
+        "groupby": ["category"]},
+        {"calculate": "ceil (datum.id/8)", "as": "col"},
+        {"calculate": "datum.id - datum.col*8", "as": "row"}
+       
+      ],
+      "encoding": {
+        "y": {"field": "col", "type": "ordinal", "axis": null},
+        "x": {"field": "row", "type": "ordinal", "axis":null},
+        "shape": {
+          "value": "M1.7 -1.7h-0.8c0.3 -0.2 0.6 -0.5 0.6 -0.9c0 -0.6 -0.4 -1 -1 -1c-0.6 0 -1 0.4 -1 1c0 0.4 0.2 0.7 0.6 0.9h-0.8c-0.4 0 -0.7 0.3 -0.7 0.6v1.9c0 0.3 0.3 0.6 0.6 0.6h0.2c0 0 0 0.1 0 0.1v1.9c0 0.3 0.2 0.6 0.3 0.6h1.3c0.2 0 0.3 -0.3 0.3 -0.6v-1.8c0 0 0 -0.1 0 -0.1h0.2c0.3 0 0.6 -0.3 0.6 -0.6v-2c0.2 -0.3 -0.1 -0.6 -0.4 -0.6z"
+        },
+        "size":{"value":10},
+        "color":{
+        
+          "field":"gender","type": "nominal","legend":{"symbolSize":10},"title":null
+        },
+        "opacity":{"condition":{"param": "click","value":1},"value":0.2},
+        "fillOpacity":{
+          "condition":  {"param": "select", "value": 1},
+      "value": 0.3
+        },
+      "column": {"field":"category",
+                 "type": "nominal",
+                 "header":{"labelFontSize":14,"labelFont":"bold","labelFontWeight":800,"title":null}}
+      },
+      "mark": {"type": "point", "filled": true},
+      "resolve": {"axis": {"x": "shared","y": "shared"}}
+    },
+  
+    {  
+       "transform": [ 
+        {"filter": {"param": "select","empty": true}},
+        {"filter": {"param": "click","empty": true}},
+        {"window": [{"op": "rank", "as": "rank"}]},
+           {"filter":{"field": "rank","lt":20}}
+       
+         ],
+      
+      "hconcat": 
+    [
+     {
+      "width":150,
+      "height":350,
+       "title": "Winner Name",
+       "mark": {  "type": "text",  "fontSize": 9}, 
+       "transform": [
+        {"calculate": "datum.firstname+' '+datum.surname","as": "fullname"}
+      ],
+       "encoding": {
+         "text": {"field": "fullname", "type": "nominal"},
+         "y": {"field":"row_number", "type": "ordinal", "axis": null}
+       }
+     },{
+      "width":100,
+      "height":350,
+       "title": "Country",
+       "mark": {  "type": "text",  "fontSize": 9}, 
+       "transform": [
+     {
+                 "lookup": "country",
+                 "from": {
+                          "data": {"url": "./data/countries_centriod.csv"},
+                          "key": "Short",
+                          "fields": [ "Country"] }}
+      ],
+      "encoding": {
+         "text": {"field": "Country", "type": "nominal"},
+         "y": {"field": "row_number", "type": "ordinal", "axis": null}
+       }
+     },{
+      "width":90,
+      "height":350,
+      "title": "Category",
+      "mark": {  "type": "text",  "fontSize": 9}, 
+      "encoding": {
+        "text": {"field": "category", "type": "nominal"},
+        "y": {"field":"row_number", "type": "ordinal", "axis": null}
+      }
+    },{
+      "width":80,
+      "height":350,
+       "title": "Winner sex",
+       "mark": {  "type": "text",  "fontSize": 9}, 
+      "encoding": {
+         "text": {"field": "gender", "type": "nominal"},
+         "y": {"field": "row_number", "type": "ordinal", "axis": null}
+       }
+     },{
+      "width":80,
+      "height":350,
+       "title": "Year for Prize",
+       "mark": {  "type": "text",  "fontSize": 9}, 
+      "encoding": {
+         "text": {"field": "year", "type": "nominal"},
+         "y": {"field": "row_number", "type": "ordinal", "axis": null}
+       }
+     },{
+      "width":80,
+      "height":350,
+       "title": "Age Getting Prize",
+       "mark": {  "type": "text",  "fontSize": 9}, 
+        "encoding": {
+         "text": {"field": "age_get_prize", "type": "nominal"},
+         "y": {"field": "row_number", "type": "ordinal", "axis": null}
+       }
+     }
+     
+   ]}
+  ]
+}
